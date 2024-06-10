@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+# env files (Also need to add the config here in a real project)
+.env
+
 # Logs
 logs
 *.log

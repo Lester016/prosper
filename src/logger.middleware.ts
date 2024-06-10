@@ -9,7 +9,8 @@ export function loggerMiddleware(
     '\x1b[1m\x1b[36m%s', // Logs will be cyan and bold.
     'Start of',
     req.method,
-    req.url,
+    req.baseUrl,
+    `[${new Date().toISOString()}]`,
     '\x1b[1m\x1b[37m', // Next logs will be white and bold.
   );
 
@@ -17,7 +18,13 @@ export function loggerMiddleware(
   res.on('finish', () => {
     // Status 400 means there was an error in response.
     if (res.statusCode < 400) {
-      console.log('\x1b[1m\x1b[33m%s', 'End of', req.method, req.url);
+      console.log(
+        '\x1b[1m\x1b[33m%s',
+        'End of',
+        req.method,
+        req.url,
+        `[${new Date().toISOString()}]`,
+      );
     }
   });
   next();
