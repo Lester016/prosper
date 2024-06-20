@@ -8,7 +8,7 @@ import {
   Post,
   UseFilters,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from 'src/exception.filter.base';
+import { HttpExceptionFilter } from '../exception.filter';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';

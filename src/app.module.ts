@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import configuration from './configuration';
 import { loggerMiddleware } from './logger.middleware';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
       load: [configuration],
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
