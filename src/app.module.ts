@@ -27,6 +27,8 @@ import { UserModule } from './user/user.module';
         database: configService.get<string>('database.mysql.name'),
         username: configService.get<string>('database.mysql.user'),
         password: configService.get<string>('database.mysql.password'),
+        autoLoadEntities: true,
+        synchronize: true,
       }),
     }),
     UserModule,
