@@ -1,11 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import configuration from './configuration';
 import { loggerMiddleware } from './logger.middleware';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,11 +17,23 @@ import { AuthModule } from './auth/auth.module';
       ],
       load: [configuration],
     }),
+    TypeOrmModule.forRootAsync({
+      // imports: [ConfigModule], No need for this because we have set isGlobal to true.
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('database.mysql.host'),
+        port: configService.get<number>('database.mysql.port'),
+        database: configService.get<string>('database.mysql.name'),
+        username: configService.get<string>('database.mysql.user'),
+        password: configService.get<string>('database.mysql.password'),
+      }),
+    }),
     UserModule,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
