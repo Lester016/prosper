@@ -1,18 +1,11 @@
-import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { error } from 'console';
-import exp from 'constants';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,13 +25,11 @@ export class AuthService {
     registerDto.password = await bcrypt.hash(registerDto.password, 10);
     const user = this.userRepository.create(registerDto);
 
-    await this.userRepository.save(user);
+    const { password, ...result } = await this.userRepository.save(user);
 
     const accessToken = this.jwtService.sign(
       {
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        user: result,
       },
       {
         expiresIn: '15m',
@@ -46,8 +37,7 @@ export class AuthService {
     );
 
     const refreshToken = this.jwtService.sign({
-      email: user.email,
-      id: user.id,
+      user: result,
     });
 
     return {
@@ -56,19 +46,31 @@ export class AuthService {
     };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(loginDto: LoginDto) {
+    const user = await this.userRepository.findOneBy({ email: loginDto.email });
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const { password, ...payload } = user;
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const accessToken = this.jwtService.sign(
+      {
+        user: payload,
+      },
+      {
+        expiresIn: '15m',
+      },
+    );
+
+    const refreshToken = this.jwtService.sign({
+      user: payload,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
