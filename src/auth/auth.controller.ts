@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseFilters,
-} from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UseFilters } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { HttpExceptionFilter } from '../exception.filter';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @UseFilters(HttpExceptionFilter)
 @Controller({ path: 'auth', version: '1' })
@@ -20,28 +11,40 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() registerDto: RegisterDto, @Req() req: any) {
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     console.log(req.ip);
-    return this.authService.register(registerDto);
+    const { accessToken, refreshToken } = await this.authService.register(
+      registerDto,
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true, // Send the cookie over HTTPS only
+      sameSite: 'strict', // Strictly limit to same site requests
+      // path: '/auth/refresh', // Limit the cookie path to the refresh endpoint
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expiry set to match the token expiry
+    });
+
+    return res.status(200).json({ accessToken });
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  @Post('login')
+  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      loginDto,
+    );
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return res.status(200).json({ accessToken });
   }
 }
