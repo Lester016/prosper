@@ -1,10 +1,12 @@
 import { Body, Controller, Post, Req, Res, UseFilters } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { HttpExceptionFilter } from '../exception.filter';
+import { Public } from './auth.decorator';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+@Public()
 @UseFilters(HttpExceptionFilter)
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
