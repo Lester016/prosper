@@ -14,12 +14,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<Request>();
     const status = exception.getStatus();
 
-    const { message } = exception.getResponse() as {
+    const error = exception.getResponse() as {
       message: string | string[];
     };
     response.status(status).send({
       statusCode: status,
-      message: message[0],
+      message:
+        error?.message instanceof Array
+          ? error.message[0]
+          : error.message || error,
     });
   }
 }
