@@ -1,0 +1,35 @@
+version: '3.8' # Specify the version of Docker Compose file format being used
+
+services:
+  app: # Define a service named 'app'
+    build: # Specify the build configuration for the service
+      context: . # Set the build context to the current directory
+      dockerfile: Dockerfile # Specify the Dockerfile to use for building the service
+    ports:
+      - 3000:8080 # Map port 3000 of the host to port 3000 of the container
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - JWT_SECRET=taengkalabaw
+      - JWT_EXPIRATION=7d
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=prosper-db
+    depends_on:
+      - db # Specify that this service depends on the 'db' service
+
+  db: # Define a service named 'db'
+    image: mysql:8.0 # Use the 'postgres' image from Docker Hub
+    restart: always # Always restart the container if it stops
+    ports:
+      - 3307:3307 # Map port 5432 of the host to port 5432 of the container
+    environment:
+      - MYSQL_DATABASE=prosper-db
+      - MYSQL_ROOT_PASSWORD=admin
+    volumes:
+      - mysql-data:/var/lib/mysql # Mount the 'mysql-data' volume to the '/var/lib/mysql' directory in the container
+
+volumes:
+  mysql-data:
