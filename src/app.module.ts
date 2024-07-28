@@ -17,6 +17,7 @@ import { UserModule } from './user/user.module';
       ],
       load: [configuration],
     }),
+    // We use async because we need to inject ConfigService.
     TypeOrmModule.forRootAsync({
       // imports: [ConfigModule], No need for this because we have set isGlobal to true.
       inject: [ConfigService],
@@ -28,7 +29,9 @@ import { UserModule } from './user/user.module';
         username: configService.get<string>('database.mysql.user'),
         password: configService.get<string>('database.mysql.password'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
+        migrationsTableName: 'migration',
+        migrations: ['database/migration/*.{js,ts}'],
       }),
     }),
     UserModule,
