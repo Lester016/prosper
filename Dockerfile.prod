@@ -13,14 +13,14 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# # Build the application
-# RUN npm run build
+# Build the application
+RUN npm run build
 
-# Remove the source code (useful for production)
-# RUN rm -rf ./src
+# Remove the source code
+RUN rm -rf ./src
 
 # Expose the port that the application will run on
 EXPOSE 8080
 
 # Start the application
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "npm", "run", "start:prod" ]

@@ -26,7 +26,7 @@ services:
     image: mysql:8.0 # Use the 'postgres' image from Docker Hub
     restart: always # Always restart the container if it stops
     ports:
-      - 5432:3306 # Map port 5432 of the host to port 3306 of the container
+      - 3307:3307 # Map port 5432 of the host to port 5432 of the container
     environment:
       - MYSQL_DATABASE=prosper-db
       - MYSQL_ROOT_PASSWORD=admin
