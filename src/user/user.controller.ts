@@ -5,11 +5,10 @@ import {
   Get,
   Param,
   Patch,
-  Post,
   UseFilters,
 } from '@nestjs/common';
+import { Public } from 'src/auth/auth.decorator';
 import { HttpExceptionFilter } from '../exception.filter';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -18,11 +17,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
+  @Public()
   @Get()
   findAll() {
     return this.userService.findAll();

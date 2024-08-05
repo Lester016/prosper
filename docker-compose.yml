@@ -17,6 +17,9 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=admin
       - MYSQL_DATABASE=prosper-db
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
     depends_on:
       - db # Specify that this service depends on the 'db' service
     volumes:

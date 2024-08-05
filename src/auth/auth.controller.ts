@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Req, Res, UseFilters } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseFilters,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { HttpExceptionFilter } from '../exception.filter';
 import { Public } from './auth.decorator';
@@ -18,7 +27,6 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    console.log(req.ip);
     const { accessToken, refreshToken } = await this.authService.register(
       registerDto,
     );
@@ -32,6 +40,22 @@ export class AuthController {
     });
 
     return res.status(200).json({ accessToken });
+  }
+
+  @Get('/google/callback')
+  async googleLogin(@Query('code') code: string, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.authService.googleLogin(
+      code,
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.send({ accessToken });
   }
 
   @Post('login')
