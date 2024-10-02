@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import configuration from './configuration';
@@ -33,6 +34,16 @@ import { UserModule } from './user/user.module';
         migrationsTableName: 'migration',
         migrations: ['database/migration/*.{js,ts}'],
       }),
+    }),
+    // Rate-limiting
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => [
+        {
+          ttl: parseInt(configService.get<string>('THROTTLE_TTL', '60')), // Default to 60 seconds if not set
+          limit: parseInt(configService.get<string>('THROTTLE_LIMIT', '10')), // Default to 10 requests if not set
+        },
+      ],
     }),
     UserModule,
     AuthModule,
