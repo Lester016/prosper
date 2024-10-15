@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @UseFilters(HttpExceptionFilter)
+// @UseInterceptors(CacheInterceptor)
 @Controller({ version: '1', path: 'user' })
 export class UserController {
   constructor(private readonly userService: UserService) {}

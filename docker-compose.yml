@@ -38,5 +38,16 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql # Mount the 'mysql-data' volume to the '/var/lib/mysql' directory in the container
 
+  redis:
+    image: redis:latest
+    container_name: redis-docker
+    ports:
+      - '6379:6379' # Expose Redis port (default is 6379)
+    volumes:
+      - redis-data:/data # Persist Redis data using a Docker volume
+    # networks:
+    #   - app-network # Place it on a shared network with the application
+
 volumes:
   mysql-data:
+  redis-data: # Create a named volume for Redis data persistence

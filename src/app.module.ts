@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -9,6 +10,15 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+      // store: redisStore,
+      // host: 'localhost',
+      // port: 6379,
+      // ttl: 600,
+      // max: 1000, // Maximum number of items in the cache
+      // password: "sample-pw"
+    }),
     ConfigModule.forRoot({
       isGlobal: true, // Necessary so we won't have to import ConfigModule in other modules.
       envFilePath: [
